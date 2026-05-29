@@ -19,6 +19,26 @@ FocusRoot giúp người dùng tập trung làm việc bằng cách trồng cây
 
 ---
 
+## 💰 Mô hình kinh doanh
+
+FocusRoot áp dụng mô hình **Freemium kết hợp Đồng tiền ảo (Coin System)**,
+cho phép kiếm doanh thu mà không làm gián đoạn trải nghiệm tập trung của người dùng.
+
+### Các gói dịch vụ
+
+| Gói | Giá | Tính năng |
+|-----|-----|-----------|
+| 🆓 **Miễn phí** | Mãi mãi | Trồng cây cơ bản, 5 loài cây, rừng cá nhân (tối đa 50 cây), thống kê đơn giản |
+| 💎 **Premium** | 25.000đ/tháng | Chế độ nhóm Peer-pressure, bảng dự đoán Drop-out (DRS), 20+ loài cây hiếm, thống kê nâng cao |
+| 🌱 **Gói Coin** | Từ 10.000đ | Mua thêm coin để mở khóa cây hiếm và tùy chỉnh giao diện |
+
+### Hệ thống Coin
+- **Kiếm coin:** Hoàn thành phiên tập trung → nhận coin tương ứng với thời lượng
+- **Tiêu coin:** Mở khóa loài cây hiếm, trang trí rừng cá nhân
+- **Donate:** 100 coin = trồng 1 cây thật (hợp tác tổ chức môi trường Việt Nam)
+
+---
+
 ## Tech Stack
 
 | Layer | Công nghệ |
