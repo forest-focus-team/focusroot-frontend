@@ -1,19 +1,18 @@
 package com.focusroot.session;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
-public interface FocusSessionRepository extends JpaRepository<Session, Long> {
-    // Kiểm tra xem user có đang chạy phiên ACTIVE nào không
-    boolean existsByUserIdAndStatus(Long userId, SessionStatus status);
+public interface FocusSessionRepository extends JpaRepository<FocusSession, Long> {
 
-    // Tìm phiên ACTIVE hiện tại của user để kết thúc
-    Optional<Session> findByUserIdAndStatus(Long userId, SessionStatus status);
+    boolean existsByUser_IdAndStatus(Long userId, FocusSession.Status status);
 
-    // Lấy lịch sử phiên tập trung của user
-    Page<Session> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+    Optional<FocusSession> findByUser_IdAndStatus(Long userId, FocusSession.Status status);
+
+    Page<FocusSession> findByUser_IdOrderByStartTimeDesc(Long userId, Pageable pageable);
 }

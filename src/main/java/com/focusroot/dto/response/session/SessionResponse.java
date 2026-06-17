@@ -10,9 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SessionResponse {
     private Long id;
-    private Integer targetDuration;
-    private Long actualDuration;
+    private Long treeSpeciesId;
+    private Integer plannedDuration;
+    private Integer actualDuration;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String status;
+    private Integer coinEarned;
 }

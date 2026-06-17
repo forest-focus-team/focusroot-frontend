@@ -1,6 +1,8 @@
 package com.focusroot.session;
 
 import com.focusroot.dto.request.session.StartSessionRequest;
+import com.focusroot.forest.TreeSpeciesRepository;
+import com.focusroot.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,29 +21,29 @@ class FocusSessionServiceTest {
     @Mock
     private FocusSessionRepository sessionRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private TreeSpeciesRepository treeSpeciesRepository;
+
     @InjectMocks
     private FocusSessionService sessionService;
 
     @Test
-    @DisplayName("Ném lỗi IllegalStateException khi User bắt đầu phiên mới nhưng đã có phiên ACTIVE")
+    @DisplayName("Ném lỗi IllegalStateException khi User bắt đầu phiên mới nhưng đã có phiên IN_PROGRESS")
     void startSession_ShouldThrowException_WhenActiveSessionExists() {
-        // 1. Arrange: Chuẩn bị dữ liệu giả lập
         Long userId = 1L;
         StartSessionRequest request = new StartSessionRequest();
-        request.setTargetDuration(25); // Giả lập mục tiêu 25 phút
+        request.setTreeId(1L);
+        request.setDurationMinutes(25);
 
-        // Giả lập Repository: Khi kiểm tra trạng thái ACTIVE của userId này, kết quả trả về là TRUE
-        when(sessionRepository.existsByUserIdAndStatus(userId, SessionStatus.ACTIVE)).thenReturn(true);
+        when(sessionRepository.existsByUser_IdAndStatus(userId, FocusSession.Status.IN_PROGRESS)).thenReturn(true);
 
-        // 2. Act & Assert: Thực thi hàm và kiểm tra xem có ném đúng lỗi ra không
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            sessionService.startSession(userId, request);
-        });
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () ->
+                sessionService.startSession(userId, request));
 
-        // Kiểm tra thông điệp báo lỗi có khớp 100% với trong Service không
         assertEquals("Bạn đang có một phiên tập trung đang chạy. Vui lòng hoàn thành hoặc hủy nó trước.", exception.getMessage());
-        
-        // Đảm bảo hệ thống chặn lại ngay và KHÔNG bao giờ gọi xuống hàm save dữ liệu vào DB
-        verify(sessionRepository, never()).save(any(Session.class));
+        verify(sessionRepository, never()).save(any(FocusSession.class));
     }
 }
