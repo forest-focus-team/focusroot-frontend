@@ -25,6 +25,12 @@ type MyForestItem = {
 
 const FALLBACK_IMG = "https://cdn-icons-png.flaticon.com/512/490/490154.png";
 
+// Seed BE có imageUrl dạng tên file tương đối (vd "sapling.png"), không phải URL đầy đủ
+// → chỉ dùng khi là http(s), ngược lại fallback ảnh mặc định để không vỡ layout.
+function resolveImg(url?: string): string {
+  return url && /^https?:\/\//.test(url) ? url : FALLBACK_IMG;
+}
+
 function formatDate(iso?: string): string {
   if (!iso) return "—";
   const d = new Date(iso);
@@ -77,7 +83,7 @@ export default function ForestScreen() {
           renderItem={({ item }) => (
             <View style={[styles.treeCard, !item.isAlive && styles.treeCardDead]}>
               <Image
-                source={{ uri: item.treeSpecies?.imageUrl || FALLBACK_IMG }}
+                source={{ uri: resolveImg(item.treeSpecies?.imageUrl) }}
                 style={[styles.treeImg, !item.isAlive && styles.treeImgDead]}
               />
               <Text style={styles.treeName}>
