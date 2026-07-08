@@ -1,22 +1,28 @@
 import axios from "axios";
 import { router } from "expo-router";
+import {
+  ACCESS_TOKEN,
+  REFRESH_TOKEN,
+  clearTokens,
+  getToken,
+  saveTokens,
+  setToken,
+} from "./tokenStorage";
+
+export const API_BASE_URL = "http://localhost:8080/api"; // Đổi sang IP LAN nếu chạy trên thiết bị thật
 
 export const apiClient = axios.create({
-  baseURL: "http://localhost:8080/api", // Thay đổi theo đúng cổng Backend của team bạn
+  baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// REQUEST INTERCEPTOR: Tự động đính kèm Access Token vào header
+// REQUEST INTERCEPTOR: Tự động đính kèm Access Token vào header (đọc từ tokenStorage — web + native)
 apiClient.interceptors.request.use(
   async (config) => {
-    // Để demo mượt mà trên Web, ta lấy từ localStorage (hoặc AsyncStorage nếu chạy Mobile)
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("accessToken")
-        : null;
+    const token = await getToken(ACCESS_TOKEN);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -31,34 +37,37 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         console.log("Access Token hết hạn! Đang gọi API làm mới token...");
-        const refreshToken =
-          typeof window !== "undefined"
-            ? localStorage.getItem("refreshToken")
-            : null;
+        const refreshToken = await getToken(REFRESH_TOKEN);
 
-        const res = await axios.post("http://localhost:8080/api/auth/refresh", {
+        // BE bọc mọi response trong ApiResponse<T> → token nằm ở res.data.data
+        const res = await axios.post(`${API_BASE_URL}/auth/refresh`, {
           refreshToken,
         });
 
-        if (res.status === 200) {
-          const newAccessToken = res.data.accessToken;
-          if (typeof window !== "undefined") {
-            localStorage.setItem("accessToken", newAccessToken);
+        const data = res.data?.data;
+        const newAccessToken = data?.accessToken;
+        const newRefreshToken = data?.refreshToken;
+
+        if (res.status === 200 && newAccessToken) {
+          // BE cấp lại CẢ access + refresh token mới → lưu cả hai
+          if (newRefreshToken) {
+            await saveTokens(newAccessToken, newRefreshToken);
+          } else {
+            await setToken(ACCESS_TOKEN, newAccessToken);
           }
           console.log("Làm mới Token thành công! Chạy lại request cũ...");
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
           return apiClient(originalRequest);
         }
+        throw new Error("Refresh response không hợp lệ");
       } catch (refreshError) {
         console.error("Refresh Token cũng hết hạn! Ép buộc đăng xuất...");
-        if (typeof window !== "undefined") {
-          localStorage.clear();
-        }
+        await clearTokens();
         router.replace("/login");
         return Promise.reject(refreshError);
       }
