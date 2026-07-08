@@ -1,5 +1,4 @@
 import { Href, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -11,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { apiClient } from "../../constants/axiosClient";
+import { saveTokens } from "../../constants/tokenStorage";
 export default function LoginScreen() {
   const router = useRouter();
 
@@ -33,12 +33,11 @@ export default function LoginScreen() {
         password: password,
       });
 
-      // Lấy token trả về từ backend thật
-      const { accessToken, refreshToken } = response.data;
+      // BE bọc mọi response trong ApiResponse<T> → token nằm ở response.data.data
+      const { accessToken, refreshToken } = response.data.data;
 
-      // Lưu trữ token bảo mật bằng expo-secure-store (Yêu cầu số 3)
-      await SecureStore.setItemAsync("accessToken", accessToken);
-      await SecureStore.setItemAsync("refreshToken", refreshToken);
+      // Lưu qua tokenStorage (nguồn duy nhất, khớp với interceptor) — web + native
+      await saveTokens(accessToken, refreshToken);
 
       Alert.alert("Thành công", "Đăng nhập thành công!", [
         { text: "OK", onPress: () => router.replace("/(tabs)" as Href) },

@@ -47,6 +47,11 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      {/* Màn còn sót lại trong thư mục (tabs) — ẩn khỏi thanh tab, chỉ 3 tab chính hiển thị */}
+      <Tabs.Screen name="detail" options={{ href: null }} />
+      <Tabs.Screen name="notifications" options={{ href: null }} />
+      <Tabs.Screen name="profile" options={{ href: null }} />
     </Tabs>
   );
 }
