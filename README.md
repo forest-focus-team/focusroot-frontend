@@ -52,3 +52,5 @@ Join our community of developers creating universal apps.
 ## Video Demo Tuần 5
 
 - [Nhấn vào đây để xem video demo tuần 5](https://drive.google.com/file/d/1UnxY3yYBO_TYdiux4xlvHhrQeO66H059/view?usp=sharing)
+
+## Nộp Bài Tuần 6
